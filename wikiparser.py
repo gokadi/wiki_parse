@@ -18,7 +18,7 @@ p_article = list()
 for sect_name in wiki_sect_subsect:
     ins_list = list()
     ins_list.append(sect_name)
-    ins_list.append(article.section(sect_name).replace("\\'", "'"))  # FIXME: doesn't replacing
+    ins_list.append(article.section(sect_name))
     if sect_name in soup_sect:
         ins_list.append('Section')
     elif sect_name in soup_subsect:
@@ -28,6 +28,7 @@ for sect_name in wiki_sect_subsect:
     ins_list.append('Summarization')
     ins_list.append('Keywords')
     p_article.append(ins_list)
+
 with open('C:/first_try.txt', 'w', encoding='utf-8') as file:
     file.write(str(p_article))
-print(p_article)
+print(str(p_article))  # Character escaping like "\'s" is the result of __str__ method. In list object it's just "'s"
