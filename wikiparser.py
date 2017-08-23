@@ -1,8 +1,11 @@
 # coding=utf-8
 import wikipedia
+import json
 from bs4 import BeautifulSoup
+from summarization import FrequencySummarizer
 # FIXME: add arg to filter 'See also', 'Notes', 'References', 'External links'
 article_name = "Michael Jackson"  # input() or "Michael Jackson"  # Uncomment in production
+content_level = 50  # int(input()) or 100  # Uncomment in production
 article = wikipedia.page(article_name)
 # In case of multiple possible articles upper line throws 'wikipedia.DisambiguationError'
 wiki_sect_subsect = [BeautifulSoup(s, "html.parser").get_text() for s in article.sections]
@@ -25,10 +28,11 @@ for sect_name in wiki_sect_subsect:
         ins_list.append('Subsection')
     else:
         ins_list.append('ERROR. No section %s' % sect_name)
-    ins_list.append('Summarization')
-    ins_list.append('Keywords')
+    fs = FrequencySummarizer()
+    ins_list.append(fs.summarize(ins_list[1], content_level))
+    ins_list.append(fs.keywords(ins_list[1]))
     p_article.append(ins_list)
-
+p_article = json.dumps(p_article, indent=2, ensure_ascii=False)
 with open('C:/first_try.txt', 'w', encoding='utf-8') as file:
-    file.write(str(p_article))
-print(str(p_article))  # Character escaping like "\'s" is the result of __str__ method. In list object it's just "'s"
+    file.write(p_article)
+print(p_article)  # Character escaping like "\'s" is the result of __str__ method. In list object it's just "'s"
