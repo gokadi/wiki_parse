@@ -1,13 +1,3 @@
-# coding=utf-8
-"""
-A summarizer based on the algorithm found in Classifier4J by Nick Lothan.
-In order to summarize a document this algorithm first determines the
-frequencies of the words in the document.  It then splits the document
-into a series of sentences.  Then it creates a summary by including the
-first sentence that includes each of the most frequent words.  Finally
-summary's sentences are reordered to reflect that of those in the original
-document.
-"""
 import operator
 
 from nltk.tokenize import sent_tokenize,word_tokenize
@@ -40,20 +30,13 @@ class FrequencySummarizer:
        freq, a dictionary where freq[w] is the frequency of w.
     """
     freq = defaultdict(int)
-    lmtzr = WordNetLemmatizer()
-    try:
-        word_sent = [word for word in word_sent if word not in self.stopwords]
-    except Exception:
-        print(word_sent)
-        raise Exception
-    word_sent = [lmtzr.lemmatize(word) for word in word_sent]
-    for word in word_sent:
-        if word not in self.stopwords and '\'' not in word and '`' not in word and word.lower() != 'the':
-          freq[word] += 1
-    # frequencies normalization
-    m = float(max(freq.values()))
+    for s in word_sent:
+        for word in s:
+            if word not in self.stopwords:
+                freq[word] += 1
+    # frequencies normalization and fitering
     for w in freq.keys():
-      freq[w] /= len(freq)
+        freq[w] /= len(freq)
     return freq
 
   def summarize(self, text, content_level):
@@ -61,9 +44,10 @@ class FrequencySummarizer:
       Return a list of n sentences
       which represent the summary of text.
     """
-    sents = sent_tokenize(text)
-    if len(sents) != 0 and content_level < 100:
-        n = len(sents) * content_level // 100
+
+    if len(text) != 0 and content_level < 100:
+        sents = sent_tokenize(text)
+        n = round(len(sents) * content_level / 100 + 0.5)
         word_sent = [word_tokenize(s.lower()) for s in sents]
         self.freq = self.compute_frequencies(word_sent)
         ranking = defaultdict(int)
@@ -81,9 +65,19 @@ class FrequencySummarizer:
     return nlargest(n, ranking, key=ranking.get)
 
   def keywords(self, text):
-      # print(self.stopwords)
-      if len(text) > 0:
-          all_keys = self.compute_frequencies(word_tokenize(text))
+      freq = defaultdict(int)
+      lmtzr = WordNetLemmatizer()
+      if len(text) != 0:
+          word_sent = word_tokenize(text)
+          word_sent = [word.lower() for word in word_sent if word not in self.stopwords]
+          word_sent = [lmtzr.lemmatize(word) for word in word_sent]
+          for word in word_sent:
+              if word not in self.stopwords and '\'' not in word and '`' not in word and word.lower() != 'the':
+                  freq[word] += 1
+          # frequencies normalization
+          for w in freq.keys():
+              freq[w] /= len(freq)
+          all_keys = freq
           keys = dict(sorted(all_keys.items(), key=operator.itemgetter(1), reverse=True)[:5])
           return ', '.join(keys.keys())
       else:
@@ -91,7 +85,6 @@ class FrequencySummarizer:
 
 if __name__ == '__main__':
     fs= FrequencySummarizer()
-    a = fs.keywords("I've tried PorterStemmer and Snowball but both don't work on all words, "
-                "missing some very common ones. My test words are: \"cats running ran "
-                "cactus cactuses cacti community communities\", and both get less than half right.")
-    print(a)
+    a = fs.summarize("I've tried ", 50)
+    print('1 '+a)
+    print(round(0.5+0.1))
