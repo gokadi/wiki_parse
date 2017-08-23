@@ -20,18 +20,21 @@ soup_subsect = [get_section(h3) for h3 in soup.findAll('h3')
 p_article = list()
 for sect_name in wiki_sect_subsect:
     ins_list = list()
-    ins_list.append(sect_name)
-    ins_list.append(article.section(sect_name))
-    if sect_name in soup_sect:
+    ins_list.append(sect_name)  # Title of section/subsection
+    ins_list.append(article.section(sect_name))  # Text of section/subsection
+
+    if sect_name in soup_sect:  # Indicator
         ins_list.append('Section')
     elif sect_name in soup_subsect:
         ins_list.append('Subsection')
     else:
         ins_list.append('ERROR. No section %s' % sect_name)
+
     fs = FrequencySummarizer()
-    ins_list.append(fs.summarize(ins_list[1], content_level))
-    ins_list.append(fs.keywords(ins_list[1]))
+    ins_list.append(fs.summarize(ins_list[1], content_level))  # Summarizing
+    ins_list.append(fs.keywords(ins_list[1]))  # Keywords
     p_article.append(ins_list)
+
 p_article = json.dumps(p_article, indent=2, ensure_ascii=False)
 with open('C:/first_try.txt', 'w', encoding='utf-8') as file:
     file.write(p_article)
