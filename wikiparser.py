@@ -2,9 +2,16 @@ import wikipedia
 import json
 from bs4 import BeautifulSoup
 from summarization import FrequencySummarizer
+import sys
+try:
+    article_name = sys.argv.get[2]
+except AttributeError:
+    article_name = "Michael Jackson"
+try:
+    content_level = int(sys.argv.get[3])
+except AttributeError:
+    content_level = 100
 
-article_name = "Los Angeles"  # input() or "Michael Jackson"  # Uncomment in production
-content_level = 10  # int(input()) or 100  # Uncomment in production
 article = wikipedia.page(article_name)
 # In case of multiple possible articles upper line throws 'wikipedia.DisambiguationError'
 wiki_sect_subsect = [BeautifulSoup(s, "html.parser").get_text() for s in article.sections]
@@ -38,6 +45,6 @@ for sect_name in wiki_sect_subsect:
     p_article.append(ins_list)
 
 p_article = json.dumps(p_article, indent=2, ensure_ascii=False)
-with open('first_try.txt', 'w', encoding='utf-8') as file:
-    file.write(p_article)
-print(p_article)  # Character escaping like "\'s" is the result of __str__ method. In list object it's just "'s"
+# with open('first_try.txt', 'w', encoding='utf-8') as file:
+#     file.write(p_article)
+print(p_article.encode('utf-8'))
