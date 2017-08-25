@@ -17,3 +17,4 @@ Script requests article with inputted name and parses it into the following stru
   [...]
 ]
 ```
+NOTE: don't install wikipedia from base repository. You should use pip install git+https://github.com/lucasdnd/Wikipedia.git instead!
