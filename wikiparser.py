@@ -6,7 +6,7 @@ import sys
 try:
     article_name = sys.argv.get[2]
 except AttributeError:
-    article_name = "Michael Jackson"
+    article_name = "Los Angeles"
 try:
     content_level = int(sys.argv.get[3])
 except AttributeError:
@@ -27,7 +27,19 @@ soup_subsect = [get_section(h3) for h3 in soup.findAll('h3')
                 if get_section(h3) != 'Contents']
 soup_subsubsect = [get_section(h4) for h4 in soup.findAll('h4')
                 if get_section(h4) != 'Contents']
+soup_subsubsubsect = [get_section(h5) for h5 in soup.findAll('h5')
+                if get_section(h5) != 'Contents']
 p_article = list()
+intro = list()
+fs = FrequencySummarizer()
+if article.content.split('=')[0]:
+    intro.append('Introduction')
+    intro.append(article.content.split('=')[0])
+    intro.append('Introduction')
+    intro.append(fs.summarize(intro[1], content_level))
+    intro.append(fs.keywords(intro[1]))
+    p_article.append(intro)
+
 for sect_name in wiki_sect_subsect:
     ins_list = list()
     ins_list.append(sect_name)  # Title of section/subsection
@@ -38,7 +50,9 @@ for sect_name in wiki_sect_subsect:
     elif sect_name in soup_subsect:
         ins_list.append('Subsection')
     elif sect_name in soup_subsubsect:
-        ins_list.append('Subsection')
+        ins_list.append('SubSubsection')
+    elif sect_name in soup_subsubsubsect:
+        ins_list.append('SubSubSubsection')
     else:
         ins_list.append('ERROR. No section %s' % sect_name)
 
