@@ -1,12 +1,9 @@
-import time
-start = time.time()
 import wikipedia
 import json
 from bs4 import BeautifulSoup
 from summarization import FrequencySummarizer
 import sys
-print('import ' + str(time.time() - start))
-
+import time
 start = time.time()
 try:
     article_name = sys.argv.get[2]
@@ -16,19 +13,14 @@ try:
     content_level = int(sys.argv.get[3])
 except AttributeError:
     content_level = 100
-print('read params ' + str(time.time() - start))
-
-start = time.time()
 article = wikipedia.page(article_name)
-print('getting article ' + str(time.time() - start))
 # In case of multiple possible articles upper line throws 'wikipedia.DisambiguationError'
-start = time.time()
 wiki_sect_subsect = [BeautifulSoup(s, 'lxml').get_text() for s in article.sections]
-print('section wiki ' + str(time.time() - start))
-start = time.time()
-soup = BeautifulSoup(article.html(), 'lxml')
-print('bs4 ' + str(time.time() - start))
-start = time.time()
+import requests
+response = requests.get(article.url)
+soup = BeautifulSoup(response.content, 'lxml')
+
+
 get_section = lambda h: h.get_text().replace('[edit]', '')
 # We need below to differ sections from subsections
 soup_sect = [get_section(h2) for h2 in soup.findAll('h2')
@@ -37,8 +29,6 @@ soup_subsect = [get_section(h3) for h3 in soup.findAll('h3')
                 if get_section(h3) != 'Contents']
 soup_subsubsect = [get_section(h4) for h4 in soup.findAll('h4')
                 if get_section(h4) != 'Contents']
-print('section division ' + str(time.time() - start))
-start = time.time()
 p_article = list()
 for sect_name in wiki_sect_subsect:
     ins_list = list()
@@ -58,12 +48,8 @@ for sect_name in wiki_sect_subsect:
     ins_list.append(fs.summarize(ins_list[1], content_level))  # Summarizing
     ins_list.append(fs.keywords(ins_list[1]))  # Keywords
     p_article.append(ins_list)
-print('creating list ' + str(time.time() - start))
 
 p_article = json.dumps(p_article, indent=2, ensure_ascii=False)
 # with open('first_try.txt', 'w', encoding='utf-8') as file:
 #     file.write(p_article)
-start = time.time()
-
 print(p_article.encode('utf-8'))
-print('creating output ' + str(time.time() - start))
