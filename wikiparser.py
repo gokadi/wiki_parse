@@ -3,8 +3,6 @@ import json
 from bs4 import BeautifulSoup
 from summarization import FrequencySummarizer
 import sys
-import time
-start = time.time()
 try:
     article_name = sys.argv.get[2]
 except AttributeError:
